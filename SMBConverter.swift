@@ -382,7 +382,7 @@ struct PopoverView: View {
 
                 ZStack(alignment: .topLeading) {
                     if vm.input.isEmpty {
-                        Text(#"\\server\share\项目\2026 计划.xlsx 或 smb://…"#)
+                        Text(verbatim: #"\\server\share\项目\2026 计划.xlsx 或 smb://…"#)
                             .font(.system(size: 12, design: .monospaced))
                             .foregroundStyle(.tertiary)
                             .padding(.horizontal, 8)
