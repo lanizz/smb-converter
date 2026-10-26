@@ -1,0 +1,527 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>共享转换器 · 安装与使用说明</title>
+<style>
+  :root{
+    --bg:#f5f5f7; --card:#fff; --text:#1d1d1f; --text2:#6e6e73; --border:#dcdce1;
+    --accent:#0071e3; --accent-soft:#e8f1fd; --green:#1f9d55; --win:#eaf7df; --win-b:#b7df9b;
+    --mac:#eef4ff; --mac-b:#9cc0f5; --code-bg:#f6f7f9; --shadow:0 1px 3px rgba(0,0,0,.08),0 12px 32px rgba(0,0,0,.08);
+  }
+  @media (prefers-color-scheme: dark){
+    :root{--bg:#1c1c1e;--card:#2c2c2e;--text:#f2f2f7;--text2:#a1a1a6;--border:#48484a;
+      --accent:#4d9bff;--accent-soft:#1c304a;--green:#30d158;--win:#22301a;--win-b:#4f6b39;
+      --mac:#1c2a44;--mac-b:#3f6db0;--code-bg:#232325;--shadow:0 1px 3px rgba(0,0,0,.4),0 12px 32px rgba(0,0,0,.35);}
+  }
+  *{box-sizing:border-box}
+  html{scroll-behavior:smooth}
+  body{margin:0;background:var(--bg);color:var(--text);
+    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","PingFang SC","Microsoft YaHei",sans-serif;
+    -webkit-font-smoothing:antialiased;line-height:1.7;}
+  .wrap{max-width:900px;margin:0 auto;padding:0 20px 80px;}
+  code,kbd,.mono{font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;}
+
+  /* Hero */
+  .hero{text-align:center;padding:64px 20px 36px;}
+  .hero .appicon{width:96px;height:96px;margin:0 auto 16px;display:block;filter:drop-shadow(0 10px 24px rgba(0,80,200,.35));}
+  .hero h1{font-size:34px;margin:0 0 8px;letter-spacing:-.02em;}
+  .hero p{color:var(--text2);font-size:16px;margin:0 0 18px;}
+  .badges{display:flex;gap:8px;justify-content:center;flex-wrap:wrap;}
+  .badge{font-size:12.5px;color:var(--text2);background:var(--card);border:1px solid var(--border);
+    border-radius:999px;padding:4px 12px;}
+
+  /* TOC */
+  nav.toc{background:var(--card);border:1px solid var(--border);border-radius:14px;box-shadow:var(--shadow);
+    padding:16px 20px;margin:8px 0 40px;display:flex;flex-wrap:wrap;gap:10px 22px;justify-content:center;}
+  nav.toc a{color:var(--accent);text-decoration:none;font-size:14px;}
+  nav.toc a:hover{text-decoration:underline;}
+
+  section{margin:48px 0;}
+  h2{font-size:24px;letter-spacing:-.01em;margin:0 0 6px;display:flex;align-items:center;gap:10px;}
+  h2 .n{display:inline-flex;align-items:center;justify-content:center;width:30px;height:30px;flex:0 0 30px;
+    background:var(--accent);color:#fff;border-radius:9px;font-size:16px;font-weight:700;}
+  .lead{color:var(--text2);font-size:15px;margin:0 0 20px;}
+  h3{font-size:17px;margin:28px 0 10px;}
+
+  .card{background:var(--card);border:1px solid var(--border);border-radius:16px;box-shadow:var(--shadow);
+    padding:22px 24px;margin:16px 0;}
+
+  /* 步骤 */
+  ol.steps{list-style:none;padding:0;margin:0;counter-reset:s;}
+  ol.steps>li{counter-increment:s;position:relative;padding:0 0 18px 46px;margin:0;}
+  ol.steps>li:last-child{padding-bottom:0;}
+  ol.steps>li::before{content:counter(s);position:absolute;left:0;top:0;width:30px;height:30px;
+    background:var(--accent-soft);color:var(--accent);border-radius:50%;
+    display:flex;align-items:center;justify-content:center;font-weight:700;font-size:14px;}
+  ol.steps>li::after{content:"";position:absolute;left:14.5px;top:32px;bottom:2px;width:2px;background:var(--border);}
+  ol.steps>li:last-child::after{display:none;}
+
+  kbd{background:var(--code-bg);border:1px solid var(--border);border-bottom-width:2px;border-radius:6px;
+    padding:1px 7px;font-size:12.5px;}
+  code{background:var(--code-bg);border:1px solid var(--border);border-radius:5px;padding:1px 6px;font-size:13px;}
+
+  /* 截图外壳 */
+  figure{margin:20px 0;}
+  figcaption{font-size:13px;color:var(--text2);margin-top:10px;text-align:center;}
+  figcaption b{color:var(--text);}
+  .shot{border-radius:14px;overflow:hidden;border:1px solid var(--border);box-shadow:var(--shadow);background:var(--card);}
+  .titlebar{display:flex;align-items:center;gap:7px;padding:9px 13px;background:linear-gradient(#ececef,#e4e5ea);
+    border-bottom:1px solid #d0d1d6;}
+  .dot{width:12px;height:12px;border-radius:50%;}
+  .dot.r{background:#ff5f57}.dot.y{background:#febc2e}.dot.g{background:#28c840}
+  .titlebar .t{flex:1;text-align:center;font-size:12.5px;color:#555;font-weight:600;}
+  @media (prefers-color-scheme: dark){
+    .titlebar{background:linear-gradient(#3a3a3c,#323234);border-bottom-color:#48484a;}
+    .titlebar .t{color:#ddd;}
+  }
+
+  /* 菜单栏 + popover 还原 */
+  .menubar{height:34px;background:linear-gradient(#d9dbe2,#cdd0d9);display:flex;align-items:center;
+    padding:0 12px;gap:14px;position:relative;}
+  @media (prefers-color-scheme: dark){.menubar{background:linear-gradient(#2c2c2e,#232325);}}
+  .menubar .mb-logo{font-weight:800;font-size:15px;}
+  .menubar .mb-spacer{flex:1;}
+  .mb-icons{display:flex;align-items:center;gap:15px;color:#3a3a3c;}
+  @media (prefers-color-scheme: dark){.mb-icons{color:#e8e8ed;}}
+  .mb-icons svg{width:19px;height:19px;display:block;opacity:.92;}
+  .mb-our{color:var(--accent)!important;position:relative;}
+  .mb-our svg{width:21px;height:21px;}
+  .mb-our::after{content:"";position:absolute;left:50%;bottom:-7px;transform:translateX(-50%);
+    border:7px solid transparent;border-top-color:#fff;}
+  @media (prefers-color-scheme: dark){.mb-our::after{border-top-color:#2b2b2d;}}
+
+  .popover{background:#fff;border-radius:13px;box-shadow:0 18px 50px rgba(0,0,0,.35);
+    width:100%;max-width:440px;margin:0 auto;padding:15px;}
+  @media (prefers-color-scheme: dark){.popover{background:#2b2b2d;color:#f2f2f7;}}
+  .pop-stage{background:#c9ccd6;padding:26px 16px 30px;}
+  @media (prefers-color-scheme: dark){.pop-stage{background:#111;}}
+
+  .field-label{display:flex;align-items:center;gap:5px;font-size:12px;font-weight:600;color:var(--text2);margin-bottom:6px;}
+  .field-label .acc{margin-left:auto;font-weight:400;font-size:10px;}
+  .mock-input{border:2px solid var(--accent);border-radius:9px;background:#fff;padding:10px 12px;
+    font-size:12.5px;min-height:64px;box-shadow:0 0 0 3px rgba(0,113,227,.18);}
+  @media (prefers-color-scheme: dark){.mock-input{background:#1c1c1e;color:#f2f2f7;}}
+  .mock-input .ph{color:#a8a8ae;}
+  .statusline{display:flex;align-items:center;gap:7px;font-size:11.5px;color:var(--text2);margin:9px 2px;}
+  .gdot{width:7px;height:7px;border-radius:50%;background:var(--green);}
+  .statusline .right{margin-left:auto;font-size:10px;color:#9a9aa0;}
+  .bigbtn{display:flex;align-items:center;justify-content:center;gap:8px;background:var(--accent);color:#fff;
+    border-radius:9px;padding:11px;font-size:14px;font-weight:600;margin:4px 0 12px;}
+  .rescard{border-radius:10px;padding:11px 12px;margin:8px 0;font-size:12px;}
+  .rescard.win{background:var(--win);}
+  .rescard.mac{background:var(--mac);}
+  .rescard .rh{display:flex;align-items:center;gap:7px;font-weight:700;font-size:11px;margin-bottom:3px;}
+  .rescard.win .rh{color:var(--green);}
+  .rescard.mac .rh{color:var(--accent);}
+  .rescard .rp{font-size:11.5px;word-break:break-all;}
+  .popfoot{display:flex;align-items:center;justify-content:space-between;font-size:11.5px;color:var(--text2);
+    margin-top:12px;padding-top:10px;border-top:1px solid var(--border);}
+  .ck{display:inline-flex;align-items:center;gap:6px;}
+  .ck .box{width:13px;height:13px;border:1.5px solid #b0b0b6;border-radius:3.5px;background:#fff;}
+  .ck.on .box{background:var(--accent);border-color:var(--accent);position:relative;}
+  .ck.on .box::after{content:"✓";color:#fff;font-size:10px;position:absolute;left:1px;top:-2px;}
+
+  /* 标注气泡 */
+  .pin{display:inline-flex;align-items:center;justify-content:center;width:20px;height:20px;border-radius:50%;
+    background:#ff3b30;color:#fff;font-size:12px;font-weight:700;flex:0 0 20px;}
+  .annot{display:flex;gap:10px;align-items:flex-start;margin:10px 0;font-size:13.5px;}
+  .annot div{min-width:0;}
+
+  /* DMG Finder */
+  .finder-body{display:flex;min-height:300px;}
+  .finder-side{width:150px;background:#f0f1f4;border-right:1px solid #d9dade;padding:14px;font-size:12px;color:#666;flex:0 0 150px;}
+  @media (prefers-color-scheme: dark){.finder-side{background:#262628;border-color:#48484a;color:#aaa;}}
+  .finder-side .si{padding:4px 8px;border-radius:6px;margin:2px 0;}
+  .finder-side .si.sel{background:var(--accent);color:#fff;}
+  .finder-main{flex:1;display:flex;align-items:center;justify-content:center;gap:26px;padding:30px;background:#fff;}
+  @media (prefers-color-scheme: dark){.finder-main{background:#2c2c2e;}}
+  .dragitem{text-align:center;width:120px;}
+  .dragitem .nm{font-size:13px;margin-top:8px;}
+  .dragarrow{font-size:40px;color:#b8b8c0;}
+
+  /* Gatekeeper 模态 */
+  .gk-stage{background:linear-gradient(135deg,#dfe3ea,#cdd3de);padding:40px 20px;display:flex;justify-content:center;}
+  @media (prefers-color-scheme: dark){.gk-stage{background:linear-gradient(135deg,#232325,#1c1c1e);}}
+  .dialog{background:#f6f6f8;border-radius:12px;width:340px;padding:22px 20px;text-align:center;
+    box-shadow:0 16px 44px rgba(0,0,0,.3);font-size:13px;}
+  @media (prefers-color-scheme: dark){.dialog{background:#333336;color:#f2f2f7;}}
+  .dialog .warn{font-size:34px;margin-bottom:8px;}
+  .dialog .dlg-btns{display:flex;gap:10px;justify-content:center;margin-top:16px;}
+  .dlg-btn{padding:7px 18px;border-radius:7px;font-size:13px;font-weight:600;}
+  .dlg-btn.cancel{background:#e3e4e8;color:#333;}
+  .dlg-btn.ok{background:var(--accent);color:#fff;}
+
+  .setrow{display:flex;align-items:center;gap:10px;padding:10px 12px;border:1px solid var(--border);
+    border-radius:10px;margin:8px 0;font-size:13px;background:var(--code-bg);}
+  .setrow .allow{margin-left:auto;background:var(--accent);color:#fff;font-size:12px;padding:4px 12px;border-radius:6px;}
+
+  .pathflow{display:grid;grid-template-columns:1fr auto 1fr;gap:12px;align-items:center;margin:16px 0;}
+  @media (max-width:640px){.pathflow{grid-template-columns:1fr;}.pathflow .arrow{transform:rotate(90deg);}}
+  .pathbox{border-radius:11px;padding:14px;font-size:12.5px;word-break:break-all;}
+  .pathbox .tag{font-size:11px;font-weight:700;margin-bottom:6px;display:block;}
+  .pathbox.in{background:var(--code-bg);border:1px solid var(--border);}
+  .pathbox.win{background:var(--win);border:1px solid var(--win-b);}
+  .pathbox.win .tag{color:var(--green);}
+  .pathbox.mac{background:var(--mac);border:1px solid var(--mac-b);}
+  .pathbox.mac .tag{color:var(--accent);}
+  .pathflow .arrow{color:var(--accent);font-size:26px;text-align:center;}
+
+  details{border:1px solid var(--border);border-radius:11px;background:var(--card);padding:0 16px;margin:10px 0;}
+  details summary{cursor:pointer;font-weight:600;padding:14px 0;list-style:none;display:flex;justify-content:space-between;align-items:center;}
+  details summary::after{content:"+";color:var(--accent);font-size:20px;}
+  details[open] summary::after{content:"–";}
+  details .ans{padding:0 0 14px;color:var(--text2);font-size:14px;}
+  details .ans p{margin:8px 0;}
+
+  .callout{border-radius:12px;padding:13px 16px;font-size:13.5px;margin:14px 0;border:1px solid;}
+  .callout.tip{background:var(--accent-soft);border-color:#bcd8f8;color:inherit;}
+  .callout.warn{background:#fff6e5;border-color:#f0d3a0;}
+  @media (prefers-color-scheme: dark){.callout.warn{background:#3a2f17;border-color:#6b5526;}}
+  .callout b{display:block;margin-bottom:3px;}
+
+  footer{text-align:center;color:var(--text2);font-size:12.5px;margin-top:50px;padding-top:24px;border-top:1px solid var(--border);}
+  .print-btn{position:fixed;right:20px;bottom:20px;background:var(--accent);color:#fff;border:none;border-radius:999px;
+    padding:10px 18px;font-size:13px;font-weight:600;box-shadow:var(--shadow);cursor:pointer;}
+  @media print{.print-btn,nav.toc{display:none;}body{background:#fff;}}
+</style>
+</head>
+<body>
+
+<div class="wrap">
+
+  <!-- ============ HERO ============ -->
+  <header class="hero">
+    <!-- App 图标（SVG 还原） -->
+    <svg class="appicon" viewBox="0 0 1024 1024" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+      <defs>
+        <linearGradient id="bg" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0" stop-color="#57adff"/><stop offset="1" stop-color="#0a57db"/>
+        </linearGradient>
+        <linearGradient id="folder" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0" stop-color="#ffffff"/><stop offset="1" stop-color="#d4e5ff"/>
+        </linearGradient>
+        <clipPath id="round"><rect x="64" y="64" width="896" height="896" rx="200"/></clipPath>
+      </defs>
+      <rect x="64" y="64" width="896" height="896" rx="200" fill="url(#bg)"/>
+      <g clip-path="url(#round)">
+        <rect x="64" y="64" width="896" height="300" fill="#ffffff" opacity="0.16"/>
+      </g>
+      <rect x="78" y="78" width="868" height="868" rx="188" fill="none" stroke="#ffffff" stroke-opacity=".35" stroke-width="4"/>
+      <rect x="252" y="588" width="250" height="92" rx="26" fill="url(#folder)"/>
+      <rect x="208" y="300" width="608" height="320" rx="46" fill="url(#folder)"/>
+      <g stroke="#084ec7" stroke-width="46" stroke-linecap="round" stroke-linejoin="round" fill="none">
+        <line x1="384" y1="462" x2="644" y2="462"/>
+        <polyline points="668,462 602,528"/><polyline points="668,462 602,396"/>
+        <polyline points="360,462 426,528"/><polyline points="360,462 426,396"/>
+      </g>
+    </svg>
+    <h1>共享转换器</h1>
+    <p>Windows 与 Mac 之间 SMB 共享路径一键互转 · 菜单栏常驻小工具</p>
+    <div class="badges">
+      <span class="badge">macOS 13 或更高</span>
+      <span class="badge">Apple 芯片 + Intel 通用</span>
+      <span class="badge">版本 1.0</span>
+    </div>
+  </header>
+
+  <nav class="toc">
+    <a href="#install">1. 安装</a>
+    <a href="#gatekeeper">2. 首次打开</a>
+    <a href="#quick">3. 快速上手</a>
+    <a href="#ui">4. 界面说明</a>
+    <a href="#convert">5. 转换示例</a>
+    <a href="#open">6. 在 Finder 打开</a>
+    <a href="#login">7. 开机启动</a>
+    <a href="#uninstall">8. 卸载</a>
+    <a href="#faq">9. 常见问题</a>
+  </nav>
+
+  <!-- ============ 1 安装 ============ -->
+  <section id="install">
+    <h2><span class="n">1</span>安装</h2>
+    <p class="lead">通过 DMG 安装，只需拖一下。</p>
+    <div class="card">
+      <ol class="steps">
+        <li>双击打开 <code>共享转换器.dmg</code>。</li>
+        <li>在弹出的 Finder 窗口中，把 <b>共享转换器</b> 图标拖到 <b>Applications（应用程序）</b> 文件夹上。</li>
+        <li>等待拷贝完成，点窗口左上角推出 DMG（或在访达侧边栏点推出符号 ⏏）。</li>
+        <li>打开「应用程序」文件夹（或启动台），找到 <b>共享转换器</b>，准备首次启动。</li>
+      </ol>
+
+      <figure>
+        <div class="shot">
+          <div class="titlebar"><span class="dot r"></span><span class="dot y"></span><span class="dot g"></span><span class="t">共享转换器</span></div>
+          <div class="finder-body">
+            <div class="finder-side">
+              <div class="si">📁 隔空投送</div>
+              <div class="si sel">💿 共享转换器</div>
+              <div class="si">🖥 应用程序</div>
+              <div class="si">🏠 个人</div>
+            </div>
+            <div class="finder-main">
+              <div class="dragitem">
+                <svg width="76" height="76" viewBox="0 0 1024 1024"><rect x="64" y="64" width="896" height="896" rx="200" fill="url(#bg2)"/>
+                  <defs><linearGradient id="bg2" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#57adff"/><stop offset="1" stop-color="#0a57db"/></linearGradient></defs>
+                  <rect x="252" y="588" width="250" height="92" rx="26" fill="#fff"/><rect x="208" y="300" width="608" height="320" rx="46" fill="#fff"/>
+                  <g stroke="#084ec7" stroke-width="46" stroke-linecap="round" stroke-linejoin="round" fill="none"><line x1="384" y1="462" x2="644" y2="462"/><polyline points="668,462 602,528"/><polyline points="668,462 602,396"/><polyline points="360,462 426,528"/><polyline points="360,462 426,396"/></g>
+                </svg>
+                <div class="nm">共享转换器.app</div>
+              </div>
+              <div class="dragarrow">➜</div>
+              <div class="dragitem">
+                <svg width="76" height="76" viewBox="0 0 100 100"><path d="M10 30h34l8 10h38v44a4 4 0 0 1-4 4H14a4 4 0 0 1-4-4z" fill="#62b3ff"/><path d="M10 36h80v8H10z" fill="#3d8bf0"/></svg>
+                <div class="nm">Applications</div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <figcaption><b>图 1-1</b>　把左侧 App 拖到右侧「应用程序」文件夹即完成安装</figcaption>
+      </figure>
+
+      <div class="callout tip"><b>💡 为什么要装到「应用程序」</b>
+        装在 <code>/Applications</code> 下，开机启动、系统登录项管理和后续更新都最稳定；不要直接在 DMG 里运行。</div>
+    </div>
+  </section>
+
+  <!-- ============ 2 首次打开 ============ -->
+  <section id="gatekeeper">
+    <h2><span class="n">2</span>首次打开（重要）</h2>
+    <p class="lead">应用未经 Mac App Store 公证，首次启动可能被 Gatekeeper 拦截，按下面任一方式放行即可。</p>
+
+    <div class="card">
+      <h3>方式 A：右键打开（推荐，最快）</h3>
+      <ol class="steps">
+        <li>在「应用程序」里找到 <b>共享转换器</b>。</li>
+        <li>按住 <b>Control 键点按</b>（或右键 / 双指点按）图标，选择「<b>打开</b>」。</li>
+        <li>弹窗里会多出一个「<b>打开</b>」按钮，点它即可。此后正常双击启动不再拦截。</li>
+      </ol>
+
+      <figure>
+        <div class="shot">
+          <div class="titlebar"><span class="dot r"></span><span class="dot y"></span><span class="dot g"></span><span class="t">无法打开的提示</span></div>
+          <div class="gk-stage">
+            <div class="dialog">
+              <div class="warn">⚠️</div>
+              <div><b>“共享转换器”无法打开</b>，因为 Apple 无法检查其是否包含恶意软件。</div>
+              <div style="color:var(--text2);margin-top:6px;font-size:12px;">此软件需要更新。请联系开发者了解更多信息。</div>
+              <div class="dlg-btns">
+                <span class="dlg-btn cancel">移到废纸篓</span>
+                <span class="dlg-btn ok">打开</span>
+              </div>
+            </div>
+          </div>
+        </div>
+        <figcaption><b>图 2-1</b>　右键 → 打开后，弹窗中才会出现「打开」按钮</figcaption>
+      </figure>
+
+      <h3>方式 B：系统设置中「仍要打开」</h3>
+      <p>如果已经双击过、被拦下，可前往：</p>
+      <div class="setrow">
+        <span> 系统设置 → 隐私与安全性</span>
+        <span>底部提示“已阻止使用共享转换器” →</span>
+        <span class="allow">仍要打开</span>
+      </div>
+
+      <h3>方式 C：提示「已损坏，应移到废纸篓」时</h3>
+      <p>个别系统对未公证应用更严格。打开「终端」，粘贴下面这行并回车，输入开机密码（输入时不显示字符），再重新启动应用：</p>
+      <pre class="card" style="margin:8px 0;overflow:auto;"><code style="border:none;background:none;">xattr -dr com.apple.quarantine /Applications/共享转换器.app</code></pre>
+
+      <div class="callout warn"><b>安全说明</b>
+        本工具为本地开源程序，不联网、不收集数据；出现提示仅因未购买 Apple 开发者证书做公证，并非应用本身有问题。</div>
+    </div>
+  </section>
+
+  <!-- ============ 3 快速上手 ============ -->
+  <section id="quick">
+    <h2><span class="n">3</span>快速上手（3 步）</h2>
+    <p class="lead">最常用的流程：复制路径 → 点图标 → 粘贴结果。</p>
+    <div class="card">
+      <ol class="steps">
+        <li>在邮件、聊天或文档里，<b>复制</b>一条共享路径（Windows 的 <code>\\服务器\…</code> 或 Mac 的 <code>smb://…</code> 都行）。</li>
+        <li>点一下屏幕<b>顶部菜单栏</b>的共享转换器图标。它会自动读取剪贴板并完成转换，<b>结果已经复制好</b>。</li>
+        <li>切到目标窗口，按 <kbd>⌘</kbd>+<kbd>V</kbd> 粘贴即可。</li>
+      </ol>
+      <div class="callout tip"><b>💡 面板会保持打开</b>
+        自动复制后面板不会消失，你可以核对结果、点「在 Finder 中打开」，或点别处关闭它。</div>
+    </div>
+  </section>
+
+  <!-- ============ 4 界面说明 ============ -->
+  <section id="ui">
+    <h2><span class="n">4</span>界面说明</h2>
+    <p class="lead">程序没有 Dock 图标，只在顶部菜单栏显示一个网络文件夹小图标。</p>
+
+    <div class="card">
+      <figure>
+        <div class="shot">
+          <!-- 菜单栏 -->
+          <div class="menubar">
+            <span class="mb-logo"></span>
+            <span class="mb-spacer"></span>
+            <div class="mb-icons">
+              <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 3l9 4v10l-9 4-9-4V7z" opacity=".4"/></svg>
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 12a8 8 0 0 1 16 0M7 12a5 5 0 0 1 10 0" /><circle cx="12" cy="17" r="1.4" fill="currentColor"/></svg>
+              <svg viewBox="0 0 24 24" fill="currentColor"><circle cx="12" cy="12" r="5" opacity=".4"/></svg>
+              <!-- 我们的图标：folder.network 单色模板 -->
+              <span class="mb-our">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+                  <path d="M3 7a2 2 0 0 1 2-2h4l2 2h8a2 2 0 0 1 2 2v2" />
+                  <path d="M3 8v9a2 2 0 0 0 2 2h6"/>
+                  <circle cx="17.5" cy="17.5" r="2.6"/>
+                  <path d="M12.6 16.6 15 15.4M19.6 15.6 10 19M20 19.6l-4 1.4" stroke-linecap="round"/>
+                </svg>
+              </span>
+              <svg viewBox="0 0 24 24" fill="currentColor"><circle cx="9" cy="9" r="3" opacity=".5"/><circle cx="16" cy="15" r="3" opacity=".5"/></svg>
+            </div>
+          </div>
+          <!-- 弹出面板（1:1 还原） -->
+          <div class="pop-stage">
+            <div class="popover">
+              <div class="field-label">
+                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="6" width="20" height="12" rx="2"/><path d="M6 10h.01M10 10h.01M14 10h.01M18 10h.01M7 14h10"/></svg>
+                在这里粘贴路径
+                <span class="acc">自动识别 Windows / Mac</span>
+              </div>
+              <div class="mock-input">
+                <span class="mono">\\fileserver\团队共享\项目文件\2026 计划.xlsx</span>
+              </div>
+              <div class="statusline">
+                <span class="gdot"></span>检测到 Windows 路径 · 已转换为 Mac
+                <span class="right">↵ 复制反向结果</span>
+              </div>
+              <div class="bigbtn">📁&nbsp; 在 Finder 中打开</div>
+
+              <div class="rescard win">
+                <div class="rh">🖥 WINDOWS</div>
+                <div class="rp mono">\\fileserver\团队共享\项目文件\2026 计划.xlsx</div>
+              </div>
+              <div class="rescard mac">
+                <div class="rh">💻 MAC</div>
+                <div class="rp mono">smb://fileserver/%E5%9B%A2%E9%98%9F…/2026%20%E8%AE%A1%E5%88%92.xlsx</div>
+              </div>
+
+              <div class="popfoot">
+                <span class="ck on"><span class="box"></span>开机启动</span>
+                <span>退出</span>
+              </div>
+            </div>
+          </div>
+        </div>
+        <figcaption><b>图 4-1</b>　菜单栏图标与弹出面板（红框处即本工具图标）</figcaption>
+      </figure>
+
+      <div class="annot"><span class="pin">1</span><div><b>输入框（3 行）</b>：粘贴或输入路径，自动识别方向。只接受一条路径；粘贴多条时自动取第一条。聚焦时蓝色高亮。</div></div>
+      <div class="annot"><span class="pin">2</span><div><b>检测状态</b>：绿点表示已识别，显示转换方向；右侧提示 <kbd>↵</kbd> 可复制反向结果。</div></div>
+      <div class="annot"><span class="pin">3</span><div><b>在 Finder 中打开</b>：直接挂载并打开这条共享，省去手动「连接服务器」。详见第 6 节。</div></div>
+      <div class="annot"><span class="pin">4</span><div><b>Windows / Mac 结果卡</b>：点任意卡片即可复制该格式。绿色为 Windows，蓝色为 Mac。</div></div>
+      <div class="annot"><span class="pin">5</span><div><b>开机启动 / 退出</b>：勾选开机自启；「退出」关闭菜单栏程序。</div></div>
+    </div>
+  </section>
+
+  <!-- ============ 5 转换示例 ============ -->
+  <section id="convert">
+    <h2><span class="n">5</span>转换示例</h2>
+    <p class="lead">支持反斜杠、正斜杠、<code>smb://</code>、<code>file://</code>，并自动处理中文与空格编码。</p>
+
+    <div class="card">
+      <h3>Windows → Mac</h3>
+      <div class="pathflow">
+        <div class="pathbox in"><span class="tag">复制到的 Windows 路径</span><span class="mono">\\fileserver\团队共享\2026 计划.xlsx</span></div>
+        <div class="arrow">→</div>
+        <div class="pathbox mac"><span class="tag">得到 Mac 路径</span><span class="mono">smb://fileserver/%E5%9B%A2%E9%98%9F…/2026%20%E8%AE%A1%E5%88%92.xlsx</span></div>
+      </div>
+
+      <h3>Mac → Windows</h3>
+      <div class="pathflow">
+        <div class="pathbox in"><span class="tag">复制到的 Mac 路径</span><span class="mono">smb://fileserver/share/a b/测试.docx</span></div>
+        <div class="arrow">→</div>
+        <div class="pathbox win"><span class="tag">得到 Windows 路径</span><span class="mono">\\fileserver\share\a b\测试.docx</span></div>
+      </div>
+
+      <div class="callout tip"><b>💡 编码规则</b>
+        空格会变成 <code>%20</code>，中文按 UTF-8 转成 <code>%XX</code>；反向转换会自动解码回原始中文和空格。文件名里本身带 <code>%</code> 也能正确处理。</div>
+    </div>
+  </section>
+
+  <!-- ============ 6 在 Finder 打开 ============ -->
+  <section id="open">
+    <h2><span class="n">6</span>在 Finder 中打开</h2>
+    <p class="lead">不想只复制路径？点蓝色大按钮直接挂载共享。</p>
+    <div class="card">
+      <ol class="steps">
+        <li>面板里已有路径时，点「<b>在 Finder 中打开</b>」。</li>
+        <li>系统会连接 SMB 共享；第一次访问该服务器可能要求输入<b>账号和密码</b>。</li>
+        <li>建议勾选「<b>在我的钥匙串中记住此密码</b>」，以后即可直接打开、免再登录。</li>
+      </ol>
+      <div class="callout warn"><b>注意</b>
+        挂载与认证由 macOS 系统完成（等同访达的「前往 → 连接服务器」），账号密码保存在系统钥匙串中，本工具不接触、不留存。</div>
+    </div>
+  </section>
+
+  <!-- ============ 7 开机启动 ============ -->
+  <section id="login">
+    <h2><span class="n">7</span>开机启动</h2>
+    <div class="card">
+      <p>勾选面板左下角的「<b>开机启动</b>」即可在登录后自动常驻菜单栏。它使用 macOS 标准登录项管理，也可随时在以下位置查看或移除：</p>
+      <div class="setrow"> 系统设置 → 通用 → 登录项与扩展 → 在后台允许</div>
+      <p>取消勾选即关闭自启，无需其它操作。</p>
+    </div>
+  </section>
+
+  <!-- ============ 8 卸载 ============ -->
+  <section id="uninstall">
+    <h2><span class="n">8</span>卸载</h2>
+    <div class="card">
+      <ol class="steps">
+        <li>先点菜单栏图标 →「退出」，关闭程序。</li>
+        <li>若开过开机启动，先取消勾选（或在「登录项」中移除）。</li>
+        <li>打开「应用程序」，把 <b>共享转换器</b> 拖到废纸篓即可。</li>
+      </ol>
+    </div>
+  </section>
+
+  <!-- ============ 9 FAQ ============ -->
+  <section id="faq">
+    <h2><span class="n">9</span>常见问题</h2>
+
+    <details><summary>菜单栏里找不到图标怎么办？</summary>
+      <div class="ans">
+        <p>顶部菜单栏图标过多时可能被系统折叠或挤到右侧。可先确认程序在运行（活动监视器搜索「共享转换器」）。</p>
+        <p>macOS 上可按住 <kbd>⌘</kbd> 键拖动菜单栏图标重新排列。重新从「应用程序」双击启动也可让它重新出现。</p>
+      </div>
+    </details>
+
+    <details><summary>点了图标，面板没有自动填内容？</summary>
+      <div class="ans">
+        <p>只有当剪贴板内容“长得像”共享路径（以 <code>\\</code>、<code>//</code>、<code>smb://</code> 或 <code>file://</code> 开头）时才会自动填入，避免覆盖你正在做的事。直接在输入框里 <kbd>⌘</kbd>+<kbd>V</kbd> 粘贴同样会立即转换并复制。</p>
+      </div>
+    </details>
+
+    <details><summary>打开共享时提示要输入账号密码？</summary>
+      <div class="ans"><p>这是 macOS 访问 SMB 服务器的正常认证。输入该共享的账号密码并勾选「在钥匙串中记住」，以后免登录。具体账号请向共享服务器管理员获取。</p></div>
+    </details>
+
+    <details><summary>转换出来的中文变成了一堆 %XX，正常吗？</summary>
+      <div class="ans"><p>正常。Mac 的 <code>smb://</code> 链接要求对中文、空格等做百分号编码，<code>%E5%9B%A2…</code> 正是「团」等字的 UTF-8 编码，访达能正确识别并打开。反向转换会自动还原成中文。</p></div>
+    </details>
+
+    <details><summary>支持哪些系统和芯片？</summary>
+      <div class="ans"><p>支持 macOS 13（Ventura）及以上，Apple 芯片（M 系列）与 Intel 均为原生通用二进制，无需 Rosetta。</p></div>
+    </details>
+
+    <details><summary>应用会联网或收集数据吗？</summary>
+      <div class="ans"><p>不会。所有转换都在本地完成；唯一的系统调用是按你要求打开 SMB 共享，由 macOS 直接处理。</p></div>
+    </details>
+  </section>
+
+  <footer>
+    共享转换器 · 安装与使用说明 · 版本 1.0<br>
+    本文档为离线单文件，可随 DMG 一并分发。
+  </footer>
+</div>
+
+<button class="print-btn" onclick="window.print()">🖨 打印 / 存为 PDF</button>
+</body>
+</html>

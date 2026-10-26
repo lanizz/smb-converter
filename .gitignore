@@ -1,0 +1,10 @@
+# 构建产物
+build/
+dist/
+*.dmg
+*.app
+
+# macOS / 编辑器
+.DS_Store
+*.swp
+*~
