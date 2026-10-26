@@ -40,7 +40,7 @@
 
 ## 安装（推荐）
 
-从 [**Releases**](https://github.com/lanizz/smb-converter/releases) 下载最新的 `共享转换器.dmg`，打开后把 **共享转换器.app** 拖进 **Applications（应用程序）**。
+从 [**Releases**](https://github.com/lanizz/smb-converter/releases) 下载最新的 `ShareConverter-*.dmg`（镜像内应用名为「共享转换器」），打开后把 **共享转换器.app** 拖进 **Applications（应用程序）**。
 
 DMG 内附《使用说明.html》，双击可查看完整图文指南。
 
