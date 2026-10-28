@@ -382,11 +382,12 @@ struct PopoverView: View {
 
                 ZStack(alignment: .topLeading) {
                     if vm.input.isEmpty {
+                        // 边距需与 JumpEditor 一致：横向 3(inset)+4(lineFragmentPadding)=7，纵向 7
                         Text(verbatim: #"\\server\share\项目\2026 计划.xlsx 或 smb://…"#)
-                            .font(.system(size: 12, design: .monospaced))
+                            .font(.system(size: 12.5, design: .monospaced))
                             .foregroundStyle(.tertiary)
-                            .padding(.horizontal, 8)
-                            .padding(.vertical, 11)
+                            .padding(.horizontal, 7)
+                            .padding(.vertical, 7)
                             .allowsHitTesting(false)
                     }
                     JumpEditor(text: $vm.input,
